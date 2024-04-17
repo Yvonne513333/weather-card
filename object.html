@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <h3>分數排名</h3>
+    <div class="list"></div>
+
+
+    <script>
+        let list = document.querySelector('.list');
+
+        // 陣列裡面放物件
+        // 數字不用加''
+        playerAll = [
+            {
+                id: 1,//這個好處是萬一被刪除,順序才不會亂
+                name: 'cucumars',
+                nickName: '一鹿狂飆',
+                age: 25,
+                power: 10000,
+                x: 0, // 當誰遇到誰的時候 => 即可聯想到 => x座標及y座標
+                y: 0,
+                score: 200,
+            },
+            {
+                id: 300,
+                name: 'cucumarsOne',
+                nickName: '萬鹿狂奔',
+                age: 25,
+                power: 10000,
+                x: 0,
+                y: 0,
+                score: 500,
+            },
+            {
+                id: 21,
+                name: 'cucumarsLove',
+                nickName: '鹿情心',
+                age: 25,
+                power: 20000,
+                x: 0,
+                y: 0,
+                score: 300,
+            }
+        ]
+
+        let animalAll = [
+            {
+                name: 'beat1',
+                nickName: '狂鹿一號',
+                power: 9000,
+                x: 0,
+                y: 0,
+            },
+            {
+                name: 'beat2',
+                nickName: '狂鹿一號',
+                power: 30000,
+                x: 0,
+                y: 0,
+            },
+        ];
+
+        // 假設用score當排名
+
+        list.innerHTML = '';
+
+        playerAll.forEach(listTable);
+
+        // 將分數寫在list裡面
+        function listTable(item, index) {
+            list.innerHTML += `${item.nickName} | ${item.power} | ${item.score}<br>`;
+        }
+
+        // 假設現在要找 id = 1 (命名idWant)
+        // 找東西可用indexof
+        let idWant = 1;
+
+        // 對item的每一項去找
+        let indexFind = playerAll.findIndex((item) => {
+            // // 
+            // if (item.id === idWant) {
+            //     console.log(999, item);
+            //     console.log(item, index, item.id, idWant,item.id === idWant);
+            //     return index; //若是的話即return,意把值弄出來,去接收它
+            // }else{
+            //     console.log('next');
+            //     console.log(777, item, index, item.id, idWant,item.id === idWant);
+            // }
+            return item.id === idWant;
+            
+        });
+        console.log(indexFind);
+
+
+
+
+
+
+
+        let idWant2 = 300;
+
+        // 對item的每一項去找
+        indexFind = playerAll.findIndex((item) => item.id === idWant2);
+        console.log(indexFind);
+
+
+    </script>
+</body>
+
+</html>

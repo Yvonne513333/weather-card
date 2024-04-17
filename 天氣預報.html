@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天氣預報</title>
+    <style>
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .nav {
+            /* background-color: brown; */
+            background-image: url('./img/sky.png');
+            width: 100%;
+            height: 150px;
+        }
+
+        .navbar {
+            /* background-color: bisque; */
+            width: 1000px;
+            height: 150px;
+            margin-left: calc(50% - 500px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        @media  (max-width: 1030px) {
+            .navbar {
+            width: 700px;
+            height: 150px;
+            margin-left: calc(50% - 350px);
+        }
+        }
+        @media  (max-width: 720px) {
+            .navbar {
+            width: 500px;
+            height: 150px;
+            margin-left: calc(50% - 250px);
+        }
+        }
+        @media  (max-width: 520px) {
+            .navbar {
+            width: 360px;
+            height: 150px;
+            margin-left: calc(50% - 180px);
+        }
+        }
+
+        .nav-btn {
+            width: 100px;
+            height: 50px;
+            color: #333;
+            border-radius: 10px;
+            border: none;
+            font-size: 19px;
+            font-family:sans-serif;
+            font-weight: bold;
+            background-color: transparent;
+        }
+
+        .nav-btn:hover {
+            cursor: pointer;
+            transform: scale(1.2);
+            box-shadow: inset 5px 5px 5px 5px #ECF5FF;
+            border: 1px solid;
+            border-radius: 20px;
+            transition: transform 0.5s;
+            color: #ECF5FF;
+        }
+
+
+        .card-region {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+
+        .card {
+            background-color: #FFFACD;
+            border: 1px solid black;
+            height: 350px;
+            width: 300px;
+            margin-right: 50px;
+            margin-bottom: 50px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            background-image: url('./img/背景.jpg');
+            
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <div class="navbar">
+            <button class="nav-btn">全國</button>
+            <button class="nav-btn">北部</button>
+            <button class="nav-btn">中部</button>
+            <button class="nav-btn">南部</button>
+            <button class="nav-btn">西部</button>
+            <button class="nav-btn">外島</button>
+        </div>
+    </div>
+
+    <div class="card-region">
+        <!-- <div class="card">A</div>
+        <div class="card">B</div>
+        <div class="card">C</div>
+        <div class="card">D</div> -->
+    </div>
+
+    <script>
+        let btnAll = document.querySelectorAll('.nav-btn');
+        // 提示:用陣列去做 及 綁事件 再 foreach
+
+        let cities = [
+            //全部的都市
+            ['基隆市', '新北市', '臺北市', '桃園市', '新竹市', '新竹縣', '苗栗縣', '臺中市', '南投縣', '彰化縣', '雲林縣', '嘉義市', '嘉義縣', '臺南市', '高雄市', '屏東縣', '宜蘭縣', '花蓮縣', '臺東縣', '澎湖縣', '金門縣', '連江縣'],
+            //北部
+            ['基隆市', '新北市', '臺北市', '桃園市', '新竹市', '新竹縣', '苗栗縣'],
+            //中部
+            ['臺中市', '南投縣', '彰化縣', '雲林縣', '嘉義市', '嘉義縣'],
+            //南部
+            ['臺南市', '高雄市', '屏東縣'],
+            //東部
+            ['宜蘭縣', '花蓮縣', '臺東縣'],
+            //外島
+            ['澎湖縣', '金門縣', '連江縣'],
+        ];
+
+        //一開始進網頁會有所有的城市(若關掉則不會出現)
+        let nowCities = cities[0];
+        //點選哪個btn按鈕就跳出該有的資訊
+        let orgData = {};
+
+        // json格式跟物件寫法主要差別在於雙引號""
+        let url = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWA-C80D5715-3F86-4740-81D1-C1A028107B0E'
+
+
+        fetch_data();
+
+        // 這個方法就不用寫五次，寫一次即可
+        btnAll.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                // switch 回家查!
+                nowCities = cities[index];
+                fetch_data();
+            });
+        });
+
+        //取得資料
+        function fetch_data() {
+            fetch(url) //勿寫分號
+                .then(function (response) {
+                    return response.json(); //有json及txt格式
+                })
+                .then(function (datas) {
+                    console.log(datas);
+                    // 1.組織資料
+                    organizationData(datas);
+                    console.log(orgData);
+                    // 2.處理城市
+                    arrangeCites();
+
+                    // 程式碼要寫在這，若寫在外面，會執行外面的程式
+                });
+        }
+
+        //整理資料及放置資料
+        function organizationData(data) {
+            let locationAll = data.records.location;
+            console.log(locationAll);
+
+            // 陣列裡面的每一項 => 叫location
+            locationAll.forEach(location => {
+                //取出城市名稱
+                let locationName = location.locationName;
+                //取出其他天氣資訊 (WeatherElements->取時間)
+                let loc_wE_t0 = location.weatherElement[0].time[0];
+                // wx => 寫天氣狀況
+                let wxCondition = loc_wE_t0.parameter.parameterName;
+                let startTime = loc_wE_t0.startTime;
+                let endTime = loc_wE_t0.endTime;
+                let minTemper = location.weatherElement[2].time[0].parameter.parameterName;
+                let maxTemper = location.weatherElement[4].time[0].parameter.parameterName;
+                let pop = location.weatherElement[2].time[0].parameter.parameterName;
+                let ci = location.weatherElement[3].time[0].parameter.parameterName;
+
+                // 非常好且特別的方法
+                orgData[locationName] = {
+                    // key         value變數(從上面拿下來用的)       
+                    'wxCondition': wxCondition,
+                    'startTime': startTime,
+                    'endTime': endTime,
+                    'minTemper': minTemper,
+                    'maxTemper': maxTemper,
+                    'pop': pop,
+                    'ci': ci,
+                }
+            });
+            console.log(orgData);
+        }
+
+        function arrangeCites() {
+            let cardRegion = document.querySelector('.card-region');
+            cardRegion.innerHTML = '';
+            
+            // 此時的nowCities已經是一維陣列nowCities[0]
+            nowCities.forEach((city, index) => {
+                let cityData = orgData[city];
+                console.log(city, cityData);
+
+                cardRegion.innerHTML += `
+                <div class="card">
+                    <h3 class="city"> ${city} </h3>
+                    <img style="height:60px;weight:60px;"src='./img/${cityData.wxCondition}.svg'alt="">
+                    <br>
+                    <span class="temper">${cityData.minTemper}°C ~ ${cityData.maxTemper}°C </span><br>
+
+                    <span class="time">${cityData.startTime}</span><br>
+                    <span class="time">至<br>${cityData.endTime}</span>
+                    <p>    
+                    <img style="height:15px;weight:15px;" src='./img/umbrella.svg'alt="">
+                    <span class="pop">${cityData.pop}%</span><br>
+                    <span class="ci">${cityData.ci}</span><br>
+                    <div class="wxCondition" style="font-weight:bold;">${cityData.wxCondition}</div>
+                </div>`;
+            });
+        }
+    </script>
+</body>
+
+</html>

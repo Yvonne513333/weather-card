@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天氣預報</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+
+        .card-region{
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card{
+            background-color: aqua;
+            border: 1px solid black;            
+            height: 300px;
+            width: 25%;
+            margin-right: 50px;
+            margin-bottom: 50px;
+            text-align: center;
+            padding: 10px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <button class="nav-btn">全省</button>
+    <button class="nav-btn">北部</button>
+
+    <div class="card-region">
+        <!-- <div class="card">A</div>
+        <div class="card">B</div>
+        <div class="card">C</div>
+        <div class="card">D</div> -->
+    </div>
+    
+    <script>
+        let btnAll = document.querySelectorAll('.nav-btn');
+        // 提示:用陣列去做 及 綁事件 再 foreach
+
+        let cities = [
+            ['基隆市', '新北市', '臺北市', '桃園市', '新竹市', '新竹縣', '苗栗縣', '臺中市', '南投縣', '彰化縣', '雲林縣', '嘉義市', '嘉義縣', '臺南市', '高雄市', '屏東縣', '宜蘭縣', '花蓮縣', '臺東縣', '澎湖縣', '金門縣', '連江縣'],
+            ['基隆市', '新北市', '臺北市', '桃園市', '新竹市', '新竹縣', '苗栗縣'],
+            ['臺中市', '南投縣', '彰化縣', '雲林縣', '嘉義市', '嘉義縣'],
+            ['臺南市', '高雄市', '屏東縣'], 
+            ['宜蘭縣', '花蓮縣', '臺東縣'], 
+            ['澎湖縣', '金門縣', '連江縣'],
+        ];
+        let nowCities = cities[0];
+        let orgData = {};
+
+
+
+
+        // json格式跟物件寫法主要差別在於雙引號""
+        let url = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWA-C80D5715-3F86-4740-81D1-C1A028107B0E'
+
+        fetch_data();
+
+        // 這個方法就不用寫五次，寫一次即可
+        btnAll.forEach((btn, index) =>{
+            btn.addEventListener('click', () =>{
+                // switch 回家查!
+                nowCities = cities[index];
+                fetch_data();                
+            });
+        });
+
+        function fetch_data(){
+        fetch(url) //勿寫分號
+            .then(function (response) {
+                return response.json(); //有json及txt格式
+            })
+            .then(function (datas) {
+                console.log(datas);
+                // 1.組織資料
+                organizationData(datas);
+                console.log(orgData);
+                // 2.處理城市
+                arrangeCites();
+
+                console.log(1);
+                console.log(2);
+                console.log(3);
+                // 妳的程式碼要寫在這
+            });
+        }
+
+        function organizationData(data) {
+            let locationAll = data.records.location;
+            console.log(locationAll);
+
+            // 陣列裡面的每一項 => 叫location
+            locationAll.forEach(location => {
+                let locationName = location.locationName;
+                let loc_wE_t0 = location.weatherElement[0].time[0];
+                // wx => 寫天氣狀況
+                let wxCondition = loc_wE_t0.parameter.parameterName;
+
+                let startTime = loc_wE_t0.startTime;
+                let endTime = loc_wE_t0.endTime;
+
+                let maxT = location.weatherElement[2].time[0].parameter.parameterName;
+
+                // let minT = location.weatherElement[3].time[0];
+                let minT = -20;
+
+                let pop = location.weatherElement[2].time[0].parameter.parameterName;
+                // let ci = location.weatherElement[4];
+                let ci = '舒適';
+
+                console.log(maxT);
+                // 非常好且特別的方法
+                orgData[locationName] = {
+                    wxCondition: wxCondition,
+                    startTime: startTime,
+                    endTime: endTime,
+                    maxT: maxT,
+                }
+            });
+
+            // 物件參考
+            let player ={}
+            player.name ='aaa';
+            player.name =200;
+
+            //用變數增加key值(好處自由變化)
+            // 利用變數放key
+            // 這邊qw會當key
+            qw = 's1';
+            player[qw] ='x1';
+
+            qw = 's2';
+            player[qw] ='x2';
+
+            console.log(orgData,player);
+
+
+            // 以下為一組 
+            let key = ['s1','s2','s3']
+            let keyValue = ['x1','x2','x3']
+
+            let orgTry ={};
+            
+            for (let i = 0; i < key.length; i++) {
+                orgTry[key[i]] =  keyValue[i]     
+            }
+            console.log(orgTry);
+            //以上為一組
+        }
+
+
+
+        function arrangeCites() {
+            let cardRegion =document.querySelector('.card-region');
+            cardRegion.innerHTML = '';
+            nowCities.forEach((city, index) =>{
+                let cityData = orgData[city];
+                console.log(city, cityData);
+                cardRegion.innerHTML += `
+                <div class="card">
+                    <span class="city"> ${city} </span>
+                    <span class="city"> ${cityData.maxT} </span>
+                </div>`;
+            });
+        }
+
+
+        // 同步   => 同一個車道
+        // 非同步 => 不同車道
+    </script>
+</body>
+
+</html>
